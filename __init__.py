@@ -1,6 +1,5 @@
 '''
 Copyright (C) 2023 Sam Clerke
-YOUR@MAIL.com
 
 Created by Sam Clerke
 Licensed under the MIT License. See LICENSE for details.
@@ -10,7 +9,7 @@ bl_info = {
     "name": "Unturned Helper",
     "description": "A set of automations making life easier for Unturned modders.",
     "author": "Sam Clerke",
-    "version": (0, 0, 1),
+    "version": (0, 0, 2),
     "blender": (4, 0, 1),
     "location": "View3D",
     "warning": "This addon is still in development.",
@@ -18,32 +17,35 @@ bl_info = {
     "category": "3D View" }
 
 
-import bpy
-
-
-# load and reload submodules
-##################################
-
+modulesNames = ['UnturnedHelperMenu', 'WindowPaneGeneration'] 
+import sys
 import importlib
-from . import developer_utils
-importlib.reload(developer_utils)
-modules = developer_utils.setup_addon_modules(__path__, __name__, "bpy" in locals())
 
+modulesFullNames = {}
+for currentModuleName in modulesNames:
+    if 'DEBUG_MODE' in sys.argv:
+        modulesFullNames[currentModuleName] = ('{}'.format(currentModuleName))
+    else:
+        modulesFullNames[currentModuleName] = ('{}.{}'.format(__name__, currentModuleName))
 
-
-# register
-##################################
-
-import traceback
+for currentModuleFullName in modulesFullNames.values():
+    if currentModuleFullName in sys.modules:
+        importlib.reload(sys.modules[currentModuleFullName])
+    else:
+        globals()[currentModuleFullName] = importlib.import_module(currentModuleFullName)
+        setattr(globals()[currentModuleFullName], 'modulesNames', modulesFullNames)
 
 def register():
-    try: bpy.utils.register_module(__name__)
-    except: traceback.print_exc()
-
-    print("Registered {} with {} modules".format(bl_info["name"], len(modules)))
+    for currentModuleName in modulesFullNames.values():
+        if currentModuleName in sys.modules:
+            if hasattr(sys.modules[currentModuleName], 'register'):
+                sys.modules[currentModuleName].register()
 
 def unregister():
-    try: bpy.utils.unregister_module(__name__)
-    except: traceback.print_exc()
+    for currentModuleName in modulesFullNames.values():
+        if currentModuleName in sys.modules:
+            if hasattr(sys.modules[currentModuleName], 'unregister'):
+                sys.modules[currentModuleName].unregister()
 
-    print("Unregistered {}".format(bl_info["name"]))
+if __name__ == "__main__":
+    register()

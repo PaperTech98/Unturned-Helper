@@ -1,16 +1,14 @@
 import bpy, bmesh
-import random
-import mathutils
-import math
 from array import *
 import numpy as np
+
+from . import Window
 
 class WindowPaneOperator(bpy.types.Operator):
     bl_idname = "wn.generate_panes"
     bl_label = "Unturned Generate Building Panes"
     
     def execute(self, context):
-        Window = bpy.data.texts["Window.py"].as_module()
 
         if bpy.context.mode != 'EDIT_MESH':
             raise Exception("Oops, you are not in edit mode")

@@ -4,6 +4,8 @@ import mathutils
 RIGHT_ANGLE = 1.5707963705062866
 
 class Window:
+    bl_idname = "unturned.window"
+
     def __init__(self, vert0):
         self.vert0 = vert0
         
@@ -193,3 +195,12 @@ class Window:
             bm.faces.new((pane_verts[11], pane_verts[3], pane_verts[1], pane_verts[9]))
             bm.faces.new((pane_verts[11], pane_verts[9], pane_verts[8], pane_verts[10]))
             
+
+def register():
+    bpy.utils.register_class(Window)
+
+def unregister():
+    bpy.utils.unregister_class(Window)
+
+if __name__ == "__main__":
+    register()
